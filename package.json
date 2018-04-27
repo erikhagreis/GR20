@@ -1,0 +1,21 @@
+{
+  "name": "ehc-gr20",
+  "version": "0.1.0",
+  "author": "erik.hagreis@gmail.com",
+  "private": true,
+  "scripts": {
+    "build": "./scripts/build.sh",
+    "start": "./scripts/start.sh"
+  },
+  "dependencies": {
+    "@types/three": "^0.91.10",
+    "awesome-typescript-loader": "^5.0.0",
+    "core-js": "^2.5.5",
+    "source-map-loader": "^0.2.3",
+    "three": "^0.92.0",
+    "typescript": "^2.8.3",
+    "webpack": "^4.6.0",
+    "webpack-cli": "^2.0.15",
+    "webpack-serve": "^0.3.1"
+  }
+}
