@@ -1,23 +1,63 @@
-import * as THREE from 'three';
+import SVG from 'svg.js';
+import { values } from 'lodash';
+import routeJson from '../.generated/route.json';
+import waypointsJson from '../.generated/waypoints.json';
+import onDocumentReady from './utils/onDocumentReady';
+import { createCoordinatesMapper } from './utils/mapCoordinates';
 
-const renderer = new THREE.WebGLRenderer();
-renderer.setSize( window.innerWidth, window.innerHeight );
-document.body.appendChild( renderer.domElement );
+const waypointNames = [
+  'Calenzana',
+  'Piobbu',
+  'Carrozzu',
+  'Asco Stagnu',
+  'Ballone',
+  'Verghio',
+  'Manganu',
+  'PetraPiana',
+  'Onda',
+  'Vizzavona'
+];
 
-const camera = new THREE.PerspectiveCamera( 45, window.innerWidth / window.innerHeight, 1, 500 );
-camera.position.set( 0, 0, 100 );
-camera.lookAt( new THREE.Vector3( 0, 0, 0 ) );
+onDocumentReady(() => {
+  const canvas = SVG('route').size(600, 600);
+  const border = canvas.rect(600, 600).fill('none').stroke({width: 1, color: '#F06'});
+  const routeDrawing = canvas.group().x(20).y(20);
 
-const scene = new THREE.Scene();
+  const routeFeature = routeJson.features[0];
+  const mapCoordinates:Function = createCoordinatesMapper(560, 560, routeFeature.bbox);
 
-const material = new THREE.LineBasicMaterial( { color: 0x0000ff } );
+  const polyline = routeDrawing.polyline(
+    routeFeature.geometry.coordinates[0].map(mapCoordinates)
+  ).fill('none').stroke({ width: 1 });
 
-const geometry = new THREE.Geometry();
-geometry.vertices.push(new THREE.Vector3( -10, 0, 0) );
-geometry.vertices.push(new THREE.Vector3( 0, 10, 0) );
-geometry.vertices.push(new THREE.Vector3( 10, 0, 0) );
+  waypointsJson.features.forEach((waypoint:any) => {
+    const position = mapCoordinates(waypoint.geometry.coordinates);
+    const label = createWaypointLabel(routeDrawing, waypoint.properties.name);
+    label.x(position[ 0 ]).y(position[ 1 ]);
+  });
+});
 
-const line = new THREE.Line( geometry, material );
+function createWaypointLabel(parent:SVG.Container, labelText:string):SVG.G {
+  const waypointLabel = parent.group();
+  const text = waypointLabel.text(labelText).font({
+    family: 'Helvetica',
+    size: 12,
+    weight: 'bold'
+  }).fill('#fff').stroke('none');
 
-scene.add( line );
-renderer.render( scene, camera );
+  const textRect = text.node.getBoundingClientRect();
+  text.move(15, textRect.height / -2);
+
+  const labelLeft = 13;
+  const labelRight = 18 + textRect.width;
+  const labelTop = -2 - textRect.height / 2;
+  const labelBottom = 2 + textRect.height / 2
+
+  const shape = waypointLabel.group();
+  shape.fill('#F06');
+  //shape.circle(8).move(-4, -4);
+  shape.polygon(`5, 0 ${labelLeft}, ${labelTop} ${labelRight}, ${labelTop} ${labelRight}, ${labelBottom} ${labelLeft}, ${labelBottom}`);
+  shape.back();
+
+  return waypointLabel;
+}

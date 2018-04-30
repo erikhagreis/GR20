@@ -21,6 +21,9 @@ module.exports = {
       }
     ]
   },
+  resolve: {
+    extensions: [ '.ts', '.js' ]
+  },
   plugins: [
     new webpack.BannerPlugin(`${name} v${version} - (c) 2018 ${author}`)
   ],
