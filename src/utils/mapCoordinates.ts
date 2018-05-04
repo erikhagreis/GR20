@@ -2,7 +2,8 @@ import { Feature, GeometryObject } from 'geojson';
 import { curry, mapValues, max, min } from 'lodash';
 
 
-export function createCoordinatesMapper(canvasWidth:number, canvasHeight:number, bounds:[ number, number, number, number ]):Function {
+export function createCoordinatesMapper(
+  canvasWidth:number, canvasHeight:number, bounds:[ number, number, number, number ]):Function {
   const lngSize = bounds[ 2 ] - bounds[ 0 ];
   const latSize = bounds[ 3 ] - bounds[ 1 ];
   const lngCenter = bounds[ 0 ] + lngSize / 2;
@@ -15,7 +16,8 @@ export function createCoordinatesMapper(canvasWidth:number, canvasHeight:number,
   const canvasCenterX = canvasWidth / 2;
   const canvasCenterY = canvasHeight / 2;
 
-  return curry(mapCoordinates)(canvasCenterX, canvasCenterY, lngCenter, latCenter, ratioDegreesToPixels);
+  return curry(mapCoordinates)(
+    canvasCenterX, canvasCenterY, lngCenter, latCenter, ratioDegreesToPixels);
 }
 
 export function mapCoordinates(
@@ -26,6 +28,6 @@ export function mapCoordinates(
 
   return [
     canvasCenterX + (coordinates[ 0 ] - lngCenter) * ratioDegreesToPixels,
-    canvasCenterY - (coordinates[ 1 ] - latCenter) * ratioDegreesToPixels
-  ]
+    canvasCenterY - (coordinates[ 1 ] - latCenter) * ratioDegreesToPixels,
+  ];
 }

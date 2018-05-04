@@ -14,12 +14,14 @@
     "svg.js": "^2.6.4"
   },
   "devDependencies": {
-    "@types/lodash": "^4.14.108",
     "@types/geojson": "^7946.0.3",
+    "@types/lodash": "^4.14.108",
     "@types/svg.js": "^2.3.1",
     "awesome-typescript-loader": "^5.0.0",
     "fs-extra": "^5.0.0",
     "source-map-loader": "^0.2.3",
+    "tslint": "^5.9.1",
+    "tslint-config-airbnb": "^5.8.0",
     "typescript": "^2.8.3",
     "webpack": "^4.6.0",
     "webpack-cli": "^2.0.15",
