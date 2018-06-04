@@ -3,7 +3,7 @@ import { values } from 'lodash';
 import routeJson from '../.generated/route.json';
 import waypointsJson from '../.generated/waypoints.json';
 import onDocumentReady from './utils/onDocumentReady';
-import { createCoordinatesMapper } from './utils/mapCoordinates';
+import { coordinateMapperFactory } from './utils/mapCoordinates';
 
 const waypointNames = [
   'Calenzana',
@@ -24,10 +24,10 @@ onDocumentReady(() => {
   const routeDrawing = canvas.group().x(20).y(20);
 
   const routeFeature = routeJson.features[0];
-  const mapCoordinates:Function = createCoordinatesMapper(560, 560, routeFeature.bbox);
+  const mapCoordinates = coordinateMapperFactory(560, 560, routeFeature.bbox);
 
   const polyline = routeDrawing.polyline(
-    routeFeature.geometry.coordinates[0].map(mapCoordinates),
+    routeFeature.geometry.coordinates.map(mapCoordinates),
   ).fill('none').stroke({ width: 1 });
   
   waypointsJson.features.forEach((waypoint:any) => {
