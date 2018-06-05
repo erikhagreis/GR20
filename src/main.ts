@@ -10,6 +10,7 @@ const waypointNames = [
   'Piobbu',
   'Carrozzu',
   'Asco Stagnu',
+  'Tighjettu',
   'Ballone',
   'Verghio',
   'Manganu',

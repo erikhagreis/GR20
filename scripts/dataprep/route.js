@@ -11,6 +11,7 @@ const waypointNames = [
   'Piobbu',
   'Carrozzu',
   'Asco Stagnu',
+  'Tighjettu',
   'Ballone',
   'Verghio',
   'Manganu',
@@ -43,7 +44,7 @@ Promise.all([
 ])
   .then(combineFeatures)
   .then(files.saveJson(config.OUTPUT_DIR, 'combined.json'))
-  .then(async () => {
+  .then(() => {
     console.log('Done prepping GPS data.')
   })
   .catch(error => {

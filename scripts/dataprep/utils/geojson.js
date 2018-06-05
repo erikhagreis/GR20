@@ -26,7 +26,6 @@ const simplifyMultiLineStringFeature = (feature) => ({
   }
 });
 
-
 const getLng = (coordinate) => coordinate[0];
 const getLat = (coordinate) => coordinate[1];
 
