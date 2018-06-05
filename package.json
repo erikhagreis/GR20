@@ -9,7 +9,7 @@
     "commitmsg": "commitlint -e $GIT_PARAMS",
     "data:route": "node scripts/dataprep/route.js",
     "data:grid": "node scripts/dataprep/grid.js",
-    "data:queryElevations": "node scripts/dataprep/queryGoogle.js",
+    "data:queryElevations": "node scripts/dataprep/elevation/queryGoogle.js",
     "test:lint": "tslint -c tslint.json 'src/**/*.ts'",
     "watch": "./scripts/watch.sh"
   },
