@@ -1,6 +1,9 @@
 const path = require('path');
-const { compose, concat, curry, flatten, filter, includes, isArray, map, maxBy, minBy } = require('lodash/fp');
-const getElevations = require('../elevation/getElevations');
+const { 
+  compose, concat, curry, flatten, filter, find, get, includes, isArray, 
+  isEqual, map, maxBy, minBy 
+} = require('lodash/fp');
+const initGetElevations = require('../elevation/getElevations');
 
 const featureInNameList = curry((nameList, feature) => 
   includes(feature.properties.name, nameList)
@@ -46,7 +49,7 @@ const addFeatureBoundingBox = (feature) => ({
     : undefined
 });
 
-const getFeatureElevations = (feature) => {
+const addFeatureElevations = curry((getElevations, feature) => {
   const coordinates = feature.geometry.type === 'Point'
     ? getElevations([ feature.geometry.coordinates ])[0]
     : feature.geometry.type === 'LineString'
@@ -55,7 +58,6 @@ const getFeatureElevations = (feature) => {
     ? map(getElevations, feature.geometry.coordinates)
     : feature.geometry.coordinates;
   
-    
   return {
     ...feature,
     geometry: {
@@ -63,12 +65,14 @@ const getFeatureElevations = (feature) => {
       coordinates 
     }
   };
-};
+});
 
-const normaliseGeoJson = async (selectedFeatureNames, geoJson) => {
+const normaliseGeoJson = curry(async (selectedFeatureNames, geoJson) => {
   const selectedFeatures = isArray(selectedFeatureNames)
     ? filter(featureInNameList(selectedFeatureNames), geoJson.features)
     : geoJson.features;
+
+  const { getElevations, saveRequestedElevations } = initGetElevations();
 
   console.log(`geoJson: normalise; selected features: ${selectedFeatureNames}`);
 
@@ -79,18 +83,20 @@ const normaliseGeoJson = async (selectedFeatureNames, geoJson) => {
           console.log(`Done processing feature: ${feature.properties.name} (${feature.geometry.type}).`);
           return feature;
         },
-        getFeatureElevations,
+        addFeatureElevations(getElevations),
         addFeatureBoundingBox,
         simplifyMultiLineStringFeature,
         cleanupFeature
       )
     );
 
+  saveRequestedElevations();
+
   return {
     type: 'FeatureCollection',
     features
   };
-};
+});
 
 const combineFeatures = (geoJsons) => ({
   type: 'FeatureCollection',
@@ -98,6 +104,8 @@ const combineFeatures = (geoJsons) => ({
 });
 
 module.exports = {
-  normaliseGeoJson: curry(normaliseGeoJson),
-  combineFeatures
+  addFeatureBoundingBox,
+  addFeatureElevations,
+  combineFeatures,
+  normaliseGeoJson,
 };

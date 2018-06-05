@@ -6,6 +6,8 @@ const { drop, get, head } = require('lodash-fp');
 const config = require('../config');
 const files = require('../utils/files');
 
+const DAILY_REQUEST_LIMIT = 2500;
+
 const loadData = async () => 
   files.loadJson(path.join(config.INPUT_DIR, 'elevations'), 'elevations.json');
 
@@ -21,7 +23,7 @@ const incrementTodaysUsage = (today, usage) => ({
 });
 
 const isWithinFreeLimit = (today, usage) =>
-  getTodaysUsage(today, usage) < 2500;
+  getTodaysUsage(today, usage) < DAILY_REQUEST_LIMIT;
 
 const areRequestsPending = (requested) => requested.length > 0;
 
@@ -66,6 +68,10 @@ async function queryGoogle() {
       apiUsage: incrementTodaysUsage(today, data.apiUsage)
     };
     counter++;
+  }
+
+  if (!isWithinFreeLimit(today, data.apiUsage)) {
+    console.log('Max daily free requests reached.');
   }
 
   return await saveData(data).then(() => {
