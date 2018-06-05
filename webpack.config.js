@@ -12,6 +12,9 @@ module.exports = {
   module: {
     rules: [
       {
+        test: require.resolve("svg.js"),
+        use: "imports-loader?define=>false"
+      }, {
         test: /\.(t|j)sx?$/,
         use: 'awesome-typescript-loader'
       }, {
