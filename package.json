@@ -8,7 +8,8 @@
     "commit": "git-cz",
     "commitmsg": "commitlint -e $GIT_PARAMS",
     "data:route": "node scripts/dataprep/route.js",
-    "data:getElevations": "node scripts/dataprep/queryGoogle.js",
+    "data:grid": "node scripts/dataprep/grid.js",
+    "data:queryElevations": "node scripts/dataprep/queryGoogle.js",
     "test:lint": "tslint -c tslint.json 'src/**/*.ts'",
     "watch": "./scripts/watch.sh"
   },

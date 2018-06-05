@@ -71,7 +71,7 @@ const normaliseGeoJson = curry(async (selectedFeatureNames, geoJson) => {
   const selectedFeatures = isArray(selectedFeatureNames)
     ? filter(featureInNameList(selectedFeatureNames), geoJson.features)
     : geoJson.features;
-
+    
   const { getElevations, saveRequestedElevations } = initGetElevations();
 
   console.log(`geoJson: normalise; selected features: ${selectedFeatureNames}`);
@@ -103,9 +103,18 @@ const combineFeatures = (geoJsons) => ({
   features: concat(...geoJsons.map((json) => json.features))
 });
 
+const getFeatureByName = curry((name, geoJson) => find(
+  compose(
+    isEqual(name), 
+    get('properties.name')
+  ), 
+  geoJson.features
+));
+
 module.exports = {
   addFeatureBoundingBox,
   addFeatureElevations,
   combineFeatures,
+  getFeatureByName,
   normaliseGeoJson,
 };
