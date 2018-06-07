@@ -8,11 +8,11 @@ const files = require('../utils/files');
 
 const DAILY_REQUEST_LIMIT = 2500;
 
-const loadData = async () => 
-  files.loadJson(path.join(config.INPUT_DIR, 'elevations'), 'elevations.json');
+const load = async (fileName) => 
+  files.loadJson(path.join(config.INPUT_DIR, 'elevations'), fileName);
 
-const saveData = async (data) => 
-  files.saveJson(path.join(config.INPUT_DIR, 'elevations'), 'elevations.json', data);
+const save = async (fileName, data) => 
+  files.saveJson(path.join(config.INPUT_DIR, 'elevations'), fileName, data);
 
 const getTodaysUsage = (today, usage) =>
   get(today, usage) || 0;
@@ -38,10 +38,10 @@ const elevationObjToCoordsArray = (elevationObj) => ([
 
 const doQuery = async (googleMapsClient, coordsList2D) => {
   try {
+    console.log(`Requesting ${coordsList2D.length} elevations.`);
     const response = await googleMapsClient.elevation({
       locations: map(coordsArrayToLatLng, coordsList2D)
     }).asPromise();
-    console.log('response', map(elevationObjToCoordsArray, response.json.results));
     return map(elevationObjToCoordsArray, response.json.results);
   } catch (e) {
     console.log(`doQuery failed: "${e.message}"`, e);
@@ -58,33 +58,38 @@ async function queryGoogle(coordsPerRequest = 1, maxRequests = Infinity) {
     Promise: Promise
   });
   const today = moment().format('YYYY-MM-DD');
-  let data = await loadData();
+  let known = await load('known.json');
+  let requested = await load('requested.json');
+  let apiUsage = await load('apiusage.json');
   let counter = 0;
   
-  console.log(`Known elevations: ${data.known.length}; Pending elevation queries: ${data.requested.length}`);
+  console.log(`Known elevations: ${known.length}; Pending coordinates: ${requested.length}`);
 
-  while (isWithinFreeLimit(today, data.apiUsage) && areRequestsPending(data.requested) && counter < maxRequests) {
-    const coordsList2D = take(coordsPerRequest, data.requested);
+  while (isWithinFreeLimit(today, apiUsage) && areRequestsPending(requested) && counter < maxRequests) {
+    const coordsList2D = take(coordsPerRequest, requested);
     const coordsList3D = await doQuery(googleMapsClient, coordsList2D);
 
-    data = {
-      ...data,
-      known: [ ...data.known, ...coordsList3D ],
-      requested: drop(coordsList2D.length, data.requested),
-      apiUsage: incrementTodaysUsage(today, data.apiUsage, coordsPerRequest)
-    };
+    known = [ ...known, ...coordsList3D ];
+    requested = drop(coordsList2D.length, requested);
+    apiUsage = incrementTodaysUsage(today, apiUsage, 1);
     counter++;
   }
 
-  if (!isWithinFreeLimit(today, data.apiUsage)) {
+  if (!isWithinFreeLimit(today, apiUsage)) {
     console.log('Max daily free requests reached.');
   }
 
-  return await saveData(data).then(() => {
+  return Promise.all([
+    save('known.json', known),
+    save('requested.json', requested),
+    save('apiusage.json', apiUsage)
+  ]).then(() => {
     const t1 = Date.now();
-    console.log(`Done querying Google Elevation API. Requested ${counter} elevations in ${t1-t0}ms.`);
+    console.log(`Done querying Google Elevation API. Requested ~${counter * coordsPerRequest} elevations in ${counter} requests in ${t1-t0}ms.`);
+  }).catch((e) => {
+    console.log('error', e);
   });
-};
+}
 
 if (require.main === module) {
   (async function() {
