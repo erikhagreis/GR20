@@ -8,11 +8,6 @@ const { getElevations, saveRequestedElevations } = initGetElevations();
 
 const METERS_PER_DEGREE = 111111; // close enough: https://knowledge.safe.com/articles/725/calculating-accurate-length-in-meters-for-lat-long.html
 
-// .283213 / (100/111111) = 314.68079643
-// .38755442 / (100/111111) = 430.615591606
-// 135020
-
-
 const loadJson = files.loadJson(config.OUTPUT_DIR);
 
 const saveJson = files.saveJson(config.OUTPUT_DIR);
@@ -65,7 +60,7 @@ loadJson('route.json')
   .then(getRouteFeature)
   .then(getBBox)
   .then(expandBBox(0.1))
-  .then(createGrid(metersToDegrees(100)))
+  .then(createGrid(metersToDegrees(250)))
   .then(toFeature('Terrain Grid', 'MultiLineString'))
   .then(addFeatureBoundingBox)
   .then(addFeatureElevations(getElevations))
