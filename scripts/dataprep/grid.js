@@ -1,5 +1,5 @@
 const path = require('path');
-const { curry, get } = require('lodash/fp');
+const { curry, get, isArray } = require('lodash/fp');
 const files = require('./utils/files');
 const config = require('./config');
 const { addFeatureBoundingBox, addFeatureElevations, getFeatureByName } = require('./utils/geojson');
@@ -51,6 +51,11 @@ const toFeature = curry((name, type, coordinates) => ({
   }
 }));
 
+const toFeatureCollection = (features) => ({
+  type: 'FeatureCollection',
+    features: isArray(features) ? features : [ features ]
+});
+
 const log = curry((description, obj) => {
   console.log(description, obj);
   return obj;
@@ -64,10 +69,7 @@ loadJson('route.json')
   .then(toFeature('Terrain Grid', 'MultiLineString'))
   .then(addFeatureBoundingBox)
   .then(addFeatureElevations(getElevations))
-  .then((feature) => ({
-    type: 'FeatureCollection',
-    features: [ feature ]
-  }))
+  .then(toFeatureCollection)
   .then(saveJson('grid.json'))
   .then(() => {
     saveRequestedElevations();    
