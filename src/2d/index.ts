@@ -1,26 +1,10 @@
 import svgJs from 'svg.js';
-import { values } from 'lodash';
-import routeJson from '../.generated/route.json';
-import waypointsJson from '../.generated/waypoints.json';
-import onDocumentReady from './utils/onDocumentReady';
-import { coordinateMapperFactory } from './utils/mapCoordinates';
+import routeJson from '../../.generated/route.json';
+import waypointsJson from '../../.generated/waypoints.json';
+import { coordinateMapperFactory } from '../utils/mapCoordinates';
 
-const waypointNames = [
-  'Calenzana',
-  'Piobbu',
-  'Carrozzu',
-  'Asco Stagnu',
-  'Tighjettu',
-  'Ballone',
-  'Verghio',
-  'Manganu',
-  'PetraPiana',
-  'Onda',
-  'Vizzavona',
-];
-
-onDocumentReady(() => {
-  const canvas = svgJs('route').size(600, 600);
+export const render2D = () => {
+  const canvas = svgJs('gr20').size(600, 600);
   const border = canvas.rect(600, 600).fill('none').stroke({ width: 1, color: '#F06' });
   const routeDrawing = canvas.group().x(20).y(20);
 
@@ -36,7 +20,7 @@ onDocumentReady(() => {
     const label = createWaypointLabel(routeDrawing, waypoint.properties.name);
     label.x(position[ 0 ]).y(position[ 1 ]);
   });
-});
+};
 
 function createWaypointLabel(parent:svgJs.Container, labelText:string):svgJs.G {
   const waypointLabel = parent.group();

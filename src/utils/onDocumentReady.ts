@@ -1,11 +1,12 @@
-export default function onDocumentReady(action:Function) {
-  if (document.readyState !== 'loading') {
+export const onDocumentReady = (action:Function) => {
+  if (document.readyState === 'loading') {
     document.addEventListener(
-      'onDOMContentLoaded', (event) => {
+      'DOMContentLoaded', (event) => {
         action();
       }, 
       false,
     );
+    return;
   }
   action();
-}
+};

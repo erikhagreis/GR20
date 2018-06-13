@@ -1,6 +1,3 @@
-import { Feature, GeometryObject } from 'geojson';
-import { curry, mapValues, max, min } from 'lodash';
-
 export const coordinateMapperFactory = (
   canvasWidth:number, 
   canvasHeight:number, 

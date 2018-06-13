@@ -4,10 +4,12 @@ const { version, name, author} = require('./package.json');
 
 module.exports = {
   mode: 'development',
-  entry: [ './src/polyfills.ts', './src/main.ts' ],
+  entry: {
+    'gr20-2d': [ './src/polyfills.ts', './src/main2d.ts' ],
+    'gr20-3d': [ './src/polyfills.ts', './src/main3d.ts' ],
+  },
   output: {
-    path: path.join(__dirname, './dist/'),
-    filename: 'gr20.js'
+    path: path.join(__dirname, './dist/')
   },
   module: {
     rules: [
